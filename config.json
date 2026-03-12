@@ -1,0 +1,44 @@
+{
+  "workflow_name": "Loan Approval Workflow",
+  "version": "1.0",
+  "stages": [
+    {
+      "stage_id": "1",
+      "type": "mandatory_check",
+      "rule": "income > 0",
+      "on_success": "next",
+      "on_failure": "REJECTED"
+    },
+    {
+      "stage_id": "2",
+      "type": "external_dependency",
+      "action": "fetch_credit_data",
+      "retry_count": 3,
+      "on_success": "next",
+      "on_failure": "SYSTEM_FAILURE"
+    },
+    {
+      "stage_id": "3",
+      "type": "threshold_check",
+      "variable": "credit_score",
+      "branches": [
+        {
+          "condition": ">=",
+          "value": 750,
+          "result": "APPROVED"
+        },
+        {
+          "condition": "between",
+          "min": 600,
+          "max": 749,
+          "result": "MANUAL_REVIEW"
+        },
+        {
+          "condition": "<",
+          "value": 600,
+          "result": "REJECTED"
+        }
+      ]
+    }
+  ]
+}
